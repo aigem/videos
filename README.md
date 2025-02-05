@@ -63,3 +63,5 @@ Discord https://discord.gg/3JWMgKQznF
 40. Deepseek v3 api + cline +cursor 【[视频教程](https://www.bilibili.com/video/BV11i6nYgEgS/)】 【[详细内容](./md/40.md)】
 
 41. 四年磨一剑 浏览器里的桌面系统竟然这么丝滑 教你安装部署daedalOS 【[视频教程](https://www.bilibili.com/video/BV1GX6qYeEKw/)】 【[详细内容](./md/41.md)】
+
+52. 本地免费部署deepseek R1模型快速拥有自己的RAG 【[视频教程](https://www.bilibili.com/video/BV1S6PCeuE2z/)】 【[详细内容](./md/52.md)】
