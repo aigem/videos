@@ -1,0 +1,728 @@
+{
+  "name": "My workflow OK",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -280,
+        20
+      ],
+      "id": "740218c6-946a-498b-aa48-628e84df4fc9",
+      "name": "When clicking 'Test workflow'"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.siliconflow.cn/v1/images/generations",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer sk-bvigddkdomxswrssufflrzgviikwhmmgdlfvblvxvibfvcwm"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "Kwai-Kolors/Kolors"
+            },
+            {
+              "name": "prompt",
+              "value": "={{ $json.text }}"
+            },
+            {
+              "name": "image_size",
+              "value": "1024x1024"
+            },
+            {
+              "name": "batch_size",
+              "value": "1"
+            },
+            {
+              "name": "num_inference_steps",
+              "value": "20"
+            },
+            {
+              "name": "guidance_scale",
+              "value": "7.5"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1240,
+        640
+      ],
+      "id": "f23faffb-bb86-423b-909d-888052e647bc",
+      "name": "硅基kolors生图"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://ttsapi.site/v1/audio/speech",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "input",
+              "value": "={{ $('伍老师回答问题学生问题').item.json.text }}"
+            },
+            {
+              "name": "voice",
+              "value": "alloy"
+            },
+            {
+              "name": "instructions",
+              "value": "=普通话发单要准确清晰，语速按1.2倍速。\n{{ $json.text }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1240,
+        20
+      ],
+      "id": "64b39629-b7a8-4898-aa82-ebc3069e7cf8",
+      "name": "openai-tts"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json['学生问题'] }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "你是资深的英语老师。对学生提出的问题进行英语方面的回答。简洁并突出重点，解决学习的核心需求、主要问题。如果回答的问题可以举例或可以造句或有与之相对应的名言名句，请加上中英两方面的举例。尽量精简,不要超80字"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        140,
+        20
+      ],
+      "id": "9a7048a7-267d-415b-a8b1-bea3d4ae238a",
+      "name": "伍老师回答问题学生问题"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('伍老师回答问题学生问题').item.json.text }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "根据内容及生活经验，参考以下格式，生成与内容想匹配的语音的语气语调及语速等的提示词。参考内容：Voice Affect: Calm, composed, and reassuring. Competent and in control, instilling trust.  Tone: Sincere, empathetic, with genuine concern for the customer and understanding of the situation.  Pacing: Slower during the apology to allow for clarity and processing. Faster when offering solutions to signal action and resolution.  Emotions: Calm reassurance, empathy, and gratitude.  Pronunciation: Clear, precise: Ensures clarity, especially with key details. Focus on key words like \"refund\" and \"patience.\"   Pauses: Before and after the apology to give space for processing the apology."
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        720,
+        20
+      ],
+      "id": "8fc29a20-9bea-4f76-a6ad-9a6b54d95cb9",
+      "name": "语气生成专员"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "deepseek/deepseek-v3-0324",
+          "mode": "list",
+          "cachedResultName": "deepseek/deepseek-v3-0324"
+        },
+        "options": {
+          "maxTokens": 8192,
+          "temperature": 0.8
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -40,
+        680
+      ],
+      "id": "1791c44f-b3ab-461e-b810-95a6d396c05d",
+      "name": "AI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "cJ3ORvWrXjPvJqAk",
+          "name": "novita.ai"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json['学生问题'] }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "你是资深的英语老师。对学生提出的问题进行英语方面的回答。简洁并突出重点，解决学习的核心需求、主要问题。如果回答的问题可以举例或可以造句或有与之相对应的名言名句，请加上中英两方面的举例。如果是故事，只输出英文故事的内容。内容不要超100字"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        140,
+        340
+      ],
+      "id": "21551c33-2cd4-48f4-afe3-7a31f524f725",
+      "name": "伍老师回答问题学生问题1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('伍老师回答问题学生问题1').item.json.text }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "根据内容及生活经验，参考以下格式，生成与内容想匹配的语音的语气语调及语速等的提示词。参考内容：Voice Affect: Calm, composed, and reassuring. Competent and in control, instilling trust.  Tone: Sincere, empathetic, with genuine concern for the customer and understanding of the situation.  Pacing: Slower during the apology to allow for clarity and processing. Faster when offering solutions to signal action and resolution.  Emotions: Calm reassurance, empathy, and gratitude.  Pronunciation: Clear, precise: Ensures clarity, especially with key details. Focus on key words like \"refund\" and \"patience.\"   Pauses: Before and after the apology to give space for processing the apology."
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        720,
+        340
+      ],
+      "id": "207e5be1-31dc-4b80-96bb-e82e8365df63",
+      "name": "语气生成专员1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c68fa921-d606-4427-9a5c-eb1964734791",
+              "name": "学生问题",
+              "value": "伍老师你好，请给我请个小故事，想听",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -100,
+        340
+      ],
+      "id": "c3218bdc-baf3-4a78-a8f3-aad79213ed11",
+      "name": "学生问题1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c68fa921-d606-4427-9a5c-eb1964734791",
+              "name": "学生问题",
+              "value": "伍老师你好，这个单词workflow是什么意思？",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -100,
+        20
+      ],
+      "id": "7ae81ea4-d695-45a8-8926-ec40f46b1b28",
+      "name": "学生问题"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json['伍老师回答问题学生问题1'] }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "根据故事来生成具象的主要物品或人物等的图片生成的提示词。"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        740,
+        640
+      ],
+      "id": "d3a6b3a8-7cb9-43a9-b348-e5ad1e55987a",
+      "name": "图片生成专员"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://ttsapi.site/v1/audio/speech",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "input",
+              "value": "={{ $('伍老师回答问题学生问题1').item.json.text }}"
+            },
+            {
+              "name": "voice",
+              "value": "alloy"
+            },
+            {
+              "name": "instructions",
+              "value": "=普通话发单要准确清晰，语速按1.2倍速。\n{{ $json.text }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1240,
+        340
+      ],
+      "id": "ea8f3eff-9212-45d5-8f30-5e2b812426f0",
+      "name": "openai-tts1"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        2520,
+        420
+      ],
+      "id": "6ffae947-c125-4f04-9571-02cfbc316b6f",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "destinationKey": "tts-data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        1500,
+        20
+      ],
+      "id": "32521b79-5301-4e19-9ca8-5c5ddffb05ef",
+      "name": "转为base64"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "destinationKey": "tts-data1",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        1500,
+        340
+      ],
+      "id": "1f12b08e-efdc-4b0f-97db-fd71f9dfc303",
+      "name": "转为base64-1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2dcb379b-61f0-4e31-9893-93619f2aca62",
+              "name": "学生问题",
+              "value": "={{ $('学生问题').item.json['学生问题'] }}",
+              "type": "string"
+            },
+            {
+              "id": "b24f506a-5d39-4bbd-a862-1da51f6cf0b9",
+              "name": "伍老师回答问题学生问题",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        520,
+        20
+      ],
+      "id": "6fa698d5-a497-42ff-bd5a-a64a2c979420",
+      "name": "保存问题和回答1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "875bf4b1-6251-4728-b0ad-74bc24d82156",
+              "name": "=学生问题",
+              "value": "={{ $('学生问题').item.json['学生问题'] }}",
+              "type": "string"
+            },
+            {
+              "id": "9a19ca39-951a-4931-a1a5-f61144646da0",
+              "name": "伍老师回答问题学生问题1",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        520,
+        340
+      ],
+      "id": "e1648e30-ee7b-4110-9491-74daac72eed3",
+      "name": "保存问题和回答2"
+    },
+    {
+      "parameters": {
+        "functionCode": "// 获取合并后的数据\nconst ttsData1 = items[0].json[\"tts-data\"];\nconst ttsData2 = items[1].json[\"tts-data1\"];\nconst imageData = items[2].json;\n\n// 尝试获取问题和回答\nlet question1 = \"伍老师你好，这个单词workflow是什么意思？\";\nlet question2 = \"伍老师你好，请给我请个小故事，想听\";\n\nlet answer1 = \"\";\nlet answer2 = \"\";\n\n// 尝试从pairedItem获取相关信息\nif (items[0].pairedItem && items[0].pairedItem.item !== undefined) {\n  try {\n    // 这里需要根据实际工作流进行调整\n    if ($('保存问题和回答1') && $('保存问题和回答1').item && $('保存问题和回答1').item.json) {\n      answer1 = $('保存问题和回答1').item.json.answer || \"\";\n    }\n  } catch (e) {\n    // 无法获取数据时保持默认值\n  }\n}\n\nif (items[1].pairedItem && items[1].pairedItem.item !== undefined) {\n  try {\n    // 这里需要根据实际工作流进行调整\n    if ($('保存问题和回答2') && $('保存问题和回答2').item && $('保存问题和回答2').item.json) {\n      answer2 = $('保存问题和回答2').item.json.answer || \"\";\n    }\n  } catch (e) {\n    // 无法获取数据时保持默认值\n  }\n}\n\n// 生成HTML\nconst html = `<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>伍老师的英语课堂</title>\n    <style>\n        body {\n            font-family: 'Microsoft YaHei', Arial, sans-serif;\n            line-height: 1.6;\n            margin: 0;\n            padding: 20px;\n            background-color: #f8f9fa;\n            color: #333;\n        }\n        .container {\n            max-width: 900px;\n            margin: 0 auto;\n            background: white;\n            padding: 30px;\n            border-radius: 12px;\n            box-shadow: 0 4px 15px rgba(0,0,0,0.1);\n        }\n        .qa-pair {\n            margin-bottom: 40px;\n            padding: 25px;\n            border-radius: 10px;\n            background-color: #f9f9f9;\n            border-left: 5px solid #4caf50;\n            transition: all 0.3s ease;\n        }\n        .qa-pair:hover {\n            box-shadow: 0 5px 15px rgba(0,0,0,0.1);\n            transform: translateY(-3px);\n        }\n        .question {\n            font-weight: bold;\n            color: #2c3e50;\n            margin-bottom: 15px;\n            font-size: 18px;\n            padding: 10px;\n            background-color: #e8f5e9;\n            border-radius: 8px;\n        }\n        .answer {\n            margin-bottom: 20px;\n            line-height: 1.8;\n            padding: 15px;\n            background-color: #ffffff;\n            border-radius: 8px;\n            border: 1px solid #e0e0e0;\n            white-space: pre-wrap;\n        }\n        .media-section {\n            margin-top: 20px;\n        }\n        .media-title {\n            color: #4caf50;\n            border-bottom: 2px solid #e0e0e0;\n            padding-bottom: 8px;\n            margin-bottom: 15px;\n            font-size: 18px;\n        }\n        audio {\n            width: 100%;\n            margin: 10px 0;\n            border-radius: 30px;\n            background-color: #e8f5e9;\n        }\n        img {\n            max-width: 100%;\n            height: auto;\n            border-radius: 10px;\n            margin: 15px 0;\n            display: block;\n            box-shadow: 0 4px 12px rgba(0,0,0,0.15);\n            transition: transform 0.3s ease;\n        }\n        img:hover {\n            transform: scale(1.02);\n        }\n        h1 {\n            color: #2c3e50;\n            text-align: center;\n            border-bottom: 3px solid #4caf50;\n            padding-bottom: 15px;\n            margin-bottom: 30px;\n            font-size: 28px;\n        }\n        .header {\n            text-align: center;\n            margin-bottom: 40px;\n        }\n        .header img {\n            width: 100px;\n            height: 100px;\n            border-radius: 50%;\n            margin: 0 auto 15px;\n            display: block;\n            object-fit: cover;\n            border: 3px solid #4caf50;\n        }\n        .timestamp {\n            text-align: right;\n            font-size: 14px;\n            color: #777;\n            font-style: italic;\n            margin-top: 15px;\n        }\n        .footer {\n            text-align: center;\n            margin-top: 40px;\n            padding-top: 20px;\n            border-top: 1px solid #eee;\n            color: #777;\n            font-size: 14px;\n        }\n    </style>\n</head>\n<body>\n    <div class=\"container\">\n        <div class=\"header\">\n            <h1>伍老师的英语课堂</h1>\n            <p>Teaching English with passion and expertise</p>\n        </div>\n        \n        <div class=\"qa-pair\">\n            <div class=\"question\">问题: ${question1}</div>\n            <div class=\"answer\">${answer1}</div>\n            <div class=\"media-section\">\n                <h3 class=\"media-title\">语音回答:</h3>\n                <audio controls>\n                    <source src=\"data:audio/mp3;base64,${ttsData1}\" type=\"audio/mp3\">\n                    您的浏览器不支持音频元素。\n                </audio>\n            </div>\n            <div class=\"timestamp\">回答时间: ${new Date().toLocaleString('zh-CN')}</div>\n        </div>\n        \n        <div class=\"qa-pair\">\n            <div class=\"question\">问题: ${question2}</div>\n            <div class=\"answer\">${answer2}</div>\n            <div class=\"media-section\">\n                <h3 class=\"media-title\">语音回答:</h3>\n                <audio controls>\n                    <source src=\"data:audio/mp3;base64,${ttsData2}\" type=\"audio/mp3\">\n                    您的浏览器不支持音频元素。\n                </audio>\n                <h3 class=\"media-title\">故事插图:</h3>\n                <img src=\"${imageData.images[0].url}\" alt=\"故事插图\">\n            </div>\n            <div class=\"timestamp\">回答时间: ${new Date().toLocaleString('zh-CN')}</div>\n        </div>\n        \n        <div class=\"footer\">\n            <p>© ${new Date().getFullYear()} 伍老师英语教学 | 由 n8n 工作流自动生成</p>\n        </div>\n    </div>\n</body>\n</html>`;\n\n// 返回生成的HTML\nreturn [{\n  json: {\n    html: html\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        2740,
+        420
+      ],
+      "id": "ade0046a-7364-49f4-b6e2-43889d979bc6",
+      "name": "生成HTML页面"
+    },
+    {
+      "parameters": {
+        "html": "={{ $json.html }}"
+      },
+      "name": "HTML预览",
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1,
+      "position": [
+        2940,
+        420
+      ],
+      "id": "e0ca9f49-647c-4dff-b971-53e7bc480b33"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b5342261-fd86-4651-8c37-60f1c7c81d01",
+              "name": "images[0].url",
+              "value": "={{ $json.images[0].url }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1500,
+        640
+      ],
+      "id": "2f33d0f9-c700-4d7f-96f6-b7be7a198958",
+      "name": "图片url"
+    }
+  ],
+  "pinData": {
+    "生成HTML页面": [
+      {
+        "json": {
+          "html": ""
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When clicking 'Test workflow'": {
+      "main": [
+        [
+          {
+            "node": "学生问题",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "硅基kolors生图": {
+      "main": [
+        [
+          {
+            "node": "图片url",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "openai-tts": {
+      "main": [
+        [
+          {
+            "node": "转为base64",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "伍老师回答问题学生问题": {
+      "main": [
+        [
+          {
+            "node": "保存问题和回答1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "语气生成专员": {
+      "main": [
+        [
+          {
+            "node": "openai-tts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "伍老师回答问题学生问题1",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "语气生成专员1",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "图片生成专员",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "伍老师回答问题学生问题",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "语气生成专员",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "伍老师回答问题学生问题1": {
+      "main": [
+        [
+          {
+            "node": "保存问题和回答2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "语气生成专员1": {
+      "main": [
+        [
+          {
+            "node": "openai-tts1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "学生问题1": {
+      "main": [
+        [
+          {
+            "node": "伍老师回答问题学生问题1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "学生问题": {
+      "main": [
+        [
+          {
+            "node": "伍老师回答问题学生问题",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "学生问题1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "图片生成专员": {
+      "main": [
+        [
+          {
+            "node": "硅基kolors生图",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "openai-tts1": {
+      "main": [
+        [
+          {
+            "node": "转为base64-1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "生成HTML页面",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "转为base64": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "转为base64-1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "保存问题和回答1": {
+      "main": [
+        [
+          {
+            "node": "语气生成专员",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "保存问题和回答2": {
+      "main": [
+        [
+          {
+            "node": "语气生成专员1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "图片生成专员",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "生成HTML页面": {
+      "main": [
+        [
+          {
+            "node": "HTML预览",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML预览": {
+      "main": [
+        []
+      ]
+    },
+    "图片url": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "84f753e2-b00e-4576-b034-8f1345800b03",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9501f726b92c2822c63011e56c8d3d259c3f2aafe02ce4257add10b45b11aebe"
+  },
+  "id": "ZqzhWGWW1tzKVV8i",
+  "tags": []
+}
